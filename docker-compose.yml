@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: pm_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: project_management
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - pm_network
+
+  app:
+    build: .
+    container_name: pm_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongodb:27017/project_management
+      JWT_SECRET: your_super_secret_jwt_key_here_change_in_production
+      JWT_EXPIRE: 7d
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - pm_network
+    command: npm run dev
+
+volumes:
+  mongodb_data:
+
+networks:
+  pm_network:
+    driver: bridge
