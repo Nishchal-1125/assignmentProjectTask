@@ -23,8 +23,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete }) => {
     }
   };
 
-  const completionPercentage = project.tasksCount > 0 
-    ? Math.round((project.completedTasksCount / project.tasksCount) * 100)
+  const completionPercentage = (project.tasksCount ?? 0) > 0 
+    ? Math.round(((project.completedTasksCount ?? 0) / (project.tasksCount ?? 1)) * 100)
     : 0;
 
   return (
@@ -35,7 +35,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, onDelete }) => {
           className="flex-1 hover:text-primary-600 transition-colors"
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {project.title}
+            {project.name}
           </h3>
           <p className="text-gray-600 text-sm line-clamp-2">
             {project.description}

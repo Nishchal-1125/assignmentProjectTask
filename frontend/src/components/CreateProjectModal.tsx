@@ -9,9 +9,9 @@ interface CreateProjectModalProps {
 }
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSuccess }) => {
-  const [title, setTitle] = useState('');
+  const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<'active' | 'completed'>('active');
+  const [status, setStatus] = useState<'planning' | 'in-progress' | 'completed' | 'on-hold'>('planning');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -22,7 +22,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSucc
 
     try {
       const response = await projectService.createProject({
-        title,
+        name,
         description,
         status,
       });
@@ -54,11 +54,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSucc
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Project Title"
+            label="Project Name"
             type="text"
-            value={title}
-            onChange={setTitle}
-            placeholder="Enter project title"
+            value={name}
+            onChange={setName}
+            placeholder="Enter project name"
             required
           />
 
@@ -76,11 +76,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ onClose, onSucc
             <label className="form-label">Status</label>
             <select
               value={status}
-              onChange={(e) => setStatus(e.target.value as 'active' | 'completed')}
+              onChange={(e) => setStatus(e.target.value as 'planning' | 'in-progress' | 'completed' | 'on-hold')}
               className="form-input"
             >
-              <option value="active">Active</option>
+              <option value="planning">Planning</option>
+              <option value="in-progress">In Progress</option>
               <option value="completed">Completed</option>
+              <option value="on-hold">On Hold</option>
             </select>
           </div>
 

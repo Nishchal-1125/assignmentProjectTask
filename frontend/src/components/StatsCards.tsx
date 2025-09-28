@@ -15,8 +15,8 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
       bgColor: 'bg-blue-50',
     },
     {
-      title: 'To Do',
-      value: stats.todo,
+      title: 'Pending',
+      value: stats.pending,
       color: 'bg-gray-500',
       textColor: 'text-gray-600',
       bgColor: 'bg-gray-50',
@@ -30,14 +30,14 @@ const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
     },
     {
       title: 'Completed',
-      value: stats.done,
+      value: stats.completed,
       color: 'bg-green-500',
       textColor: 'text-green-600',
       bgColor: 'bg-green-50',
     },
     {
       title: 'Overdue',
-      value: stats.overdue,
+      value: stats.overdue ?? 0,
       color: 'bg-red-500',
       textColor: 'text-red-600',
       bgColor: 'bg-red-50',

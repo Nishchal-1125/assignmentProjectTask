@@ -14,8 +14,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ projects, onClose, on
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [projectId, setProjectId] = useState('');
-  const [status, setStatus] = useState<'todo' | 'in-progress' | 'done'>('todo');
-  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [status, setStatus] = useState<'pending' | 'in-progress' | 'completed'>('pending');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -101,7 +101,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ projects, onClose, on
               <option value="">Select a project</option>
               {projects.map((project) => (
                 <option key={project._id} value={project._id}>
-                  {project.title}
+                  {project.name}
                 </option>
               ))}
             </select>
@@ -121,12 +121,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ projects, onClose, on
               <label className="form-label">Status</label>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as 'todo' | 'in-progress' | 'done')}
+                onChange={(e) => setStatus(e.target.value as 'pending' | 'in-progress' | 'completed')}
                 className="form-input"
               >
-                <option value="todo">To Do</option>
+                <option value="pending">Pending</option>
                 <option value="in-progress">In Progress</option>
-                <option value="done">Done</option>
+                <option value="completed">Completed</option>
               </select>
             </div>
 
@@ -134,12 +134,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ projects, onClose, on
               <label className="form-label">Priority</label>
               <select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high' | 'urgent')}
                 className="form-input"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
+                <option value="urgent">Urgent</option>
               </select>
             </div>
           </div>
