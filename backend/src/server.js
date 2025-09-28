@@ -31,6 +31,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/project_management')
+// console.log(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 

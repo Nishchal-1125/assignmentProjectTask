@@ -22,8 +22,8 @@ services:
       - "5000:5000"
     environment:
       NODE_ENV: development
-      MONGO_URI: mongodb://mongodb:27017/project_management
-      JWT_SECRET: your_super_secret_jwt_key_here_change_in_production
+      MONGO_URI: mongodb://mongodb:27017/project_management    #mongodb+srv://nishchalinfogentech_db_user:SzAkOu0glgqXzmcu@cluster0.figbmx6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      JWT_SECRET: a0f6c0892025cc1d33f69a9403bf07e0cebb04406046d5e4c43cb92beba415602033c98b739fd7e7537be3ae9a09b0e6
       JWT_EXPIRE: 7d
     depends_on:
       - mongodb
