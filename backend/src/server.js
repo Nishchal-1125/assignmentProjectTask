@@ -41,10 +41,10 @@ app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
-});
+// // Health check endpoint
+// app.get('/api/health', (req, res) => {
+//   res.json({ status: 'OK', message: 'Server is running' });
+// });
 
 // Error handling middleware
 app.use((err, req, res, next) => {

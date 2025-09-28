@@ -7,7 +7,9 @@ require('dotenv').config();
 const seedData = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/project_management');
-    // console.log('Connected to MongoDB');
+        // await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://nishchalinfogentech_db_user:zAkOu0glgqXzmcu@cluster0.figbmx6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+
+    console.log('Connected to MongoDB',process.env.MONGODB_URI );
 
     await User.deleteMany({});
     await Project.deleteMany({});
@@ -72,12 +74,10 @@ const seedData = async () => {
     ];
 
     const savedProjects = await Project.insertMany(projects);
-    console.log('Sample projects created');
+    // console.log('Sample projects created');
 
-    // Create tasks for each project (at least 3 tasks per project)
     const tasks = [];
     
-    // E-commerce Platform tasks
     tasks.push(
       {
         title: 'Design product catalog UI',
