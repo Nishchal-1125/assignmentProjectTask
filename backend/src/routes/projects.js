@@ -38,12 +38,31 @@ router.get('/', auth, async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit));
 
+    const projectsWithProgress = await Promise.all(
+      projects.map(async (project) => {
+        const tasks = await Task.find({ project: project._id });
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(task => task.status === 'completed').length;
+        const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
+        
+        const progressPercentage = totalTasks > 0 
+          ? Math.round(((completedTasks + (inProgressTasks * 0.5)) / totalTasks) * 100)
+          : 0;
+
+        return {
+          ...project.toObject(),
+          progress: progressPercentage,
+          inProgressTasksCount: inProgressTasks
+        };
+      })
+    );
+
     const total = await Project.countDocuments(query);
 
     res.json({
       success: true,
       data: {
-        projects,
+        projects: projectsWithProgress,
         pagination: {
           current: parseInt(page),
           pages: Math.ceil(total / limit),
@@ -91,10 +110,29 @@ router.get('/:id', auth, async (req, res) => {
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 });
 
+    // Calculate progress
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter(task => task.status === 'completed').length;
+    const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
+    
+    // Progress calculation: completed tasks + (in-progress tasks * 0.5)
+    const progressPercentage = totalTasks > 0 
+      ? Math.round(((completedTasks + (inProgressTasks * 0.5)) / totalTasks) * 100)
+      : 0;
+
+    // Add progress to project data
+    const projectWithProgress = {
+      ...project.toObject(),
+      progress: progressPercentage,
+      tasksCount: totalTasks,
+      completedTasksCount: completedTasks,
+      inProgressTasksCount: inProgressTasks
+    };
+
     res.json({
       success: true,
       data: {
-        project,
+        project: projectWithProgress,
         tasks
       }
     });

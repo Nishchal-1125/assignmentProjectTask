@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { projectService, taskService } from '../services';
 import { Project, Task, TaskStats } from '../types';
 import { Button, Loader, Pagination } from '../components/common';
-import ProjectCard from '../components/ProjectCard';
 import TaskCard from '../components/TaskCard';
 import CreateProjectModal from '../components/CreateProjectModal';
 import CreateTaskModal from '../components/CreateTaskModal';
@@ -11,6 +11,7 @@ import StatsCards from '../components/StatsCards';
 
 const DashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stats, setStats] = useState<TaskStats | null>(null);
@@ -24,6 +25,9 @@ const DashboardPage: React.FC = () => {
   const [tasksPagination, setTasksPagination] = useState({ current: 1, total: 0, pages: 1 });
   const [projectsPage, setProjectsPage] = useState(1);
   const [tasksPage, setTasksPage] = useState(1);
+  
+  // UI state
+  const [showRecentActivity, setShowRecentActivity] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -165,113 +169,145 @@ const DashboardPage: React.FC = () => {
         {/* Stats Cards */}
         {stats && <StatsCards stats={stats} />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-          {/* Projects Section */}
-          <div>
+        {/* Projects Section - Simple List */}
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Recent Projects</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCreateProject(true)}
-              >
+              <h2 className="text-xl font-semibold text-gray-900">Projects</h2>
+              <Button onClick={() => setShowCreateProject(true)}>
                 Add Project
               </Button>
             </div>
 
-            <div className="space-y-4">
-              {projects.length === 0 ? (
-                <div className="card p-8 text-center">
-                  <p className="text-gray-500 mb-4">No projects yet</p>
-                  <Button
-                    variant="primary"
-                    onClick={() => setShowCreateProject(true)}
-                  >
-                    Create Your First Project
-                  </Button>
-                </div>
-              ) : (
-                projects.map((project) => (
-                  <ProjectCard
-                    key={project._id}
-                    project={project}
-                    onDelete={handleProjectDeleted}
-                  />
-                ))
-              )}
-            </div>
-            
-            {/* Projects Pagination */}
-            <Pagination
-              currentPage={projectsPagination.current}
-              totalPages={projectsPagination.pages}
-              onPageChange={handleProjectsPageChange}
-              showInfo={true}
-              totalItems={projectsPagination.total}
-              itemsPerPage={6}
-            />
-          </div>
-
-          {/* Tasks Section */}
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Recent Tasks</h2>
-              <div className="flex items-center space-x-2">
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value as any)}
-                  className="form-input text-sm"
-                >
-                  <option value="all">All Tasks</option>
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowCreateTask(true)}
-                >
-                  Add Task
+            {projects.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">No projects yet</p>
+                <Button onClick={() => setShowCreateProject(true)}>
+                  Create Your First Project
                 </Button>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              {filteredTasks.length === 0 ? (
-                <div className="card p-8 text-center">
-                  <p className="text-gray-500 mb-4">
-                    {filterStatus === 'all' ? 'No tasks yet' : `No ${filterStatus} tasks`}
-                  </p>
-                  <Button
-                    variant="primary"
-                    onClick={() => setShowCreateTask(true)}
-                  >
-                    Create Your First Task
-                  </Button>
+            ) : (
+              <>
+                <div className="space-y-3 mb-6">
+                  {projects.map((project) => (
+                    <div
+                      key={project._id}
+                      onClick={() => navigate(`/projects/${project._id}`)}
+                      className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900">{project.name}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{project.description}</p>
+                          
+                          {/* Progress Bar */}
+                          <div className="mt-3">
+                            <div className="flex justify-between items-center mb-1">
+                              <span className="text-xs text-gray-500">Progress</span>
+                              <span className="text-xs text-gray-500">{project.progress || 0}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                style={{ width: `${project.progress || 0}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center mt-2 text-sm text-gray-500 space-x-4">
+                            <span>Tasks: {project.tasksCount || 0}</span>
+                            <span>Completed: {project.completedTasksCount || 0}</span>
+                          </div>
+                        </div>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          project.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          project.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {project.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                filteredTasks.map((task) => (
-                  <TaskCard
-                    key={task._id}
-                    task={task}
-                    onUpdate={handleTaskUpdated}
-                    onDelete={handleTaskDeleted}
-                  />
-                ))
-              )}
+                
+                {/* Projects Pagination - More Visible */}
+                {projectsPagination.pages > 1 && (
+                  <div className="border-t pt-4 bg-gray-50 -mx-6 px-6 py-4">
+                    <Pagination
+                      currentPage={projectsPagination.current}
+                      totalPages={projectsPagination.pages}
+                      onPageChange={handleProjectsPageChange}
+                      showInfo={true}
+                      totalItems={projectsPagination.total}
+                      itemsPerPage={6}
+                    />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+        {/* Recent Activity Section - Expandable */}
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow">
+            {/* Header - Always Visible */}
+            <div 
+              className="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50"
+              onClick={() => setShowRecentActivity(!showRecentActivity)}
+            >
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
+                <p className="text-sm text-gray-500 mt-1">Latest projects and tasks</p>
+              </div>
+              <svg 
+                className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${showRecentActivity ? 'rotate-180' : ''}`}
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
             
-            {/* Tasks Pagination */}
-            <Pagination
-              currentPage={tasksPagination.current}
-              totalPages={tasksPagination.pages}
-              onPageChange={handleTasksPageChange}
-              showInfo={true}
-              totalItems={tasksPagination.total}
-              itemsPerPage={8}
-            />
+            {/* Expandable Content */}
+            {showRecentActivity && (
+              <div className="border-t p-6">
+                {tasks.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">No recent activity yet</p>
+                    <p className="text-sm text-gray-400">New projects and tasks will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {tasks.slice(0, 6).map((task) => (
+                      <div key={task._id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-900">{task.title}</p>
+                          <p className="text-sm text-gray-500">
+                            Created {new Date(task.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 py-1 text-xs rounded-full ${
+                            task.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            task.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {task.status}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            Task
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+        </div>
         </div>
       </main>
 

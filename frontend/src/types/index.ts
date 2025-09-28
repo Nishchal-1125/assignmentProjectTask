@@ -21,6 +21,8 @@ export interface Project {
   tags?: string[];
   tasksCount?: number;
   completedTasksCount?: number;
+  inProgressTasksCount?: number;
+  progress?: number;
   createdAt: string;
   updatedAt: string;
 }
