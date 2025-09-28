@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { Button, Input } from '../components/common';
 
 const RegisterPage: React.FC = () => {
@@ -8,10 +9,10 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   const { register, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,15 +23,14 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      showToast('Passwords do not match. Please try again.', 'error');
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      showToast('Password must be at least 6 characters long.', 'error');
       return;
     }
 
@@ -38,11 +38,13 @@ const RegisterPage: React.FC = () => {
 
     try {
       const success = await register(name, email, password);
-      if (!success) {
-        setError('Registration failed. Please try again.');
+      if (success) {
+        showToast('Registration successful! Welcome to Project Manager!', 'success');
+      } else {
+        showToast('Registration failed. Please check your details and try again.', 'error');
       }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      showToast('Registration failed. Please check your connection and try again.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -95,12 +97,6 @@ const RegisterPage: React.FC = () => {
               placeholder="Confirm your password"
               required
             />
-
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
 
             <Button
               type="submit"
