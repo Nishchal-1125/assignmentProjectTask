@@ -1,37 +1,36 @@
 {
-  "name": "project-management-backend",
+  "name": "project-management-system",
   "version": "1.0.0",
-  "description": "Project Management Backend with JWT Authentication",
-  "main": "src/server.js",
+  "description": "Full-stack project management system with React frontend and Node.js backend",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "test-server": "node server-test.js",
-    "seed": "node src/seeders/index.js",
-    "test": "jest"
+    "dev": "concurrently \"npm run backend:dev\" \"npm run frontend:dev\"",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:start": "cd backend && npm start",
+    "backend:seed": "cd backend && npm run seed",
+    "frontend:dev": "cd frontend && npm start",
+    "frontend:build": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "mongoose": "^7.5.0",
-    "bcryptjs": "^2.4.3",
-    "jsonwebtoken": "^9.0.2",
-    "dotenv": "^16.3.1",
-    "cors": "^2.8.5",
-    "express-validator": "^7.0.1",
-    "helmet": "^7.0.0",
-    "express-rate-limit": "^6.10.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1",
-    "jest": "^29.6.4"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nishchal-1125/assignmentProjectTask.git"
   },
   "keywords": [
+    "project-management",
+    "react",
     "nodejs",
-    "express",
     "mongodb",
-    "jwt",
-    "project-management"
+    "typescript",
+    "jwt-authentication"
   ],
-  "author": "Developer",
-  "license": "MIT"
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }

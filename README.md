@@ -1,6 +1,21 @@
-# Project Management Backend API
-
-A comprehensive Node.js backend API for project management with user authentication, project creation, and task tracking functionality.
+# Project Management System
+├── backend/                 # Node.js/Express backend
+│   ├── src/
+│   │   ├── models/         # MongoDB schemas
+│   │   ├── routes/         # API routes  
+│   │   ├── middleware/     # Authentication middleware
+│   │   └── seeders/        # Database seed scripts
+│   └── package.json
+├── frontend/               # React TypeScript frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── components/     # Reusable components
+│   │   ├── pages/         # Page components
+│   │   ├── services/      # API service functions
+│   │   └── types/         # TypeScript definitions
+│   └── package.json
+└── package.json           # Root package with scripts
+```
 
 ## 🚀 Features
 
@@ -23,19 +38,17 @@ A comprehensive Node.js backend API for project management with user authenticat
 
 1. **Clone and navigate to the project:**
    ```bash
-   cd assignment_project_task
+   git clone https://github.com/Nishchal-1125/assignmentProjectTask.git
+   cd assignmentProjectTask
    ```
 
-2. **Install dependencies:**
+2. **Install dependencies for all packages:**
    ```bash
+   # Install root dependencies (includes concurrently)
    npm install
-   ```
-
-3. **Setup environment variables:**
-   ```bash
-   # The .env file is already created with default values
-   # Update MONGO_URI if your MongoDB connection is different
-   # Update JWT_SECRET in production
+   
+   # Install all dependencies (backend + frontend)
+   npm run install:all
    ```
 
 4. **Start MongoDB:**
@@ -59,24 +72,31 @@ A comprehensive Node.js backend API for project management with user authenticat
    **Option 3: MongoDB Atlas (Cloud)**
    ```bash
    # Update MONGO_URI in .env file with your Atlas connection string
-   # MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/project_management
+   # MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/project_management 
    ```
+   #will made cluster of mongodb in production
 
 5. **Seed the database:**
    ```bash
-   npm run seed
+   npm run backend:seed
    ```
 
-6. **Start the server:**
+6. **Start the application:**
    ```bash
-   # Development mode with nodemon
+   # Start both frontend and backend (Recommended)
    npm run dev
-
-   # Production mode
-   npm start
+   
+   # Or start individually:
+   # Backend development mode
+   npm run backend:dev
+   
+   # Frontend development mode (in another terminal)
+   npm run frontend:dev
    ```
 
-The server will start on `http://localhost:5000`
+The application will be available at:
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:5001
 
 ## 🗃️ Database Schema
 
@@ -357,42 +377,30 @@ The seed script creates:
 
 - **13 Total Tasks** with various statuses and priorities
 
-## 🔒 Security Features
 
-- **JWT Authentication** - Secure token-based authentication
-- **Password Hashing** - bcrypt with salt rounds
-- **Rate Limiting** - Prevents brute force attacks
-- **Input Validation** - Comprehensive validation using express-validator
-- **CORS** - Cross-origin resource sharing configuration
-- **Security Headers** - Using helmet.js
-- **Environment Variables** - Sensitive data protection
-
-## 📁 Project Structure
-
-```
-src/
-├── middleware/
-│   └── auth.js          # JWT authentication middleware
-├── models/
-│   ├── User.js          # User model with password hashing
-│   ├── Project.js       # Project model with task counts
-│   └── Task.js          # Task model with validations
-├── routes/
-│   ├── auth.js          # Authentication routes
-│   ├── projects.js      # Project CRUD routes
-│   └── tasks.js         # Task CRUD routes
-├── seeders/
-│   └── index.js         # Database seeding script
-└── server.js            # Main server file
-```
-
-## 🚀 Available Scripts
-
+### Root Level Scripts (Recommended)
 ```bash
+npm run dev              # Start both frontend and backend in development mode
+npm run install:all      # Install dependencies for all packages
+npm run backend:dev      # Start backend in development mode
+npm run backend:start    # Start backend in production mode
+npm run backend:seed     # Run database seeder
+npm run frontend:dev     # Start frontend development server
+npm run frontend:build   # Build frontend for production
+```
+
+### Individual Package Scripts
+```bash
+# Backend (cd backend)
 npm start        # Start production server
 npm run dev      # Start development server with nodemon
 npm run seed     # Seed database with test data
 npm test         # Run tests (jest - to be implemented)
+
+# Frontend (cd frontend)
+npm start        # Start development server
+npm run build    # Build for production
+npm test         # Run tests
 ```
 
 ## 🌐 Environment Variables
@@ -460,7 +468,3 @@ This backend is ready for frontend integration. The recommended frontend stack w
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License.
