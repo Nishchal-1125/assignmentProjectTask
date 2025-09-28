@@ -7,7 +7,7 @@ require('dotenv').config();
 const seedData = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/project_management');
-        // await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://nishchalinfogentech_db_user:zAkOu0glgqXzmcu@cluster0.figbmx6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
+ 
 
     console.log('Connected to MongoDB',process.env.MONGODB_URI );
 
