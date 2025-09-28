@@ -1,20 +1,26 @@
 export interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  role?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Project {
   _id: string;
-  title: string;
+  name: string;
   description: string;
-  status: 'active' | 'completed';
-  owner: string;
-  tasksCount: number;
-  completedTasksCount: number;
+  status: 'planning' | 'in-progress' | 'completed' | 'on-hold';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  startDate?: string;
+  endDate?: string;
+  owner: User | string;
+  team?: User[];
+  tags?: string[];
+  tasksCount?: number;
+  completedTasksCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,11 +29,14 @@ export interface Task {
   _id: string;
   title: string;
   description: string;
-  status: 'todo' | 'in-progress' | 'done';
-  dueDate: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  dueDate?: string;
+  assignedTo?: User;
   project: Project | string;
-  assignedTo: User | string;
-  priority: 'low' | 'medium' | 'high';
+  createdBy: User;
+  tags?: string[];
+  completedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,10 +68,10 @@ export interface PaginationData<T> {
 
 export interface TaskStats {
   total: number;
-  todo: number;
+  pending: number;
   'in-progress': number;
-  done: number;
-  overdue: number;
+  completed: number;
+  overdue?: number;
 }
 
 export interface LoginCredentials {
@@ -77,30 +86,36 @@ export interface RegisterData {
 }
 
 export interface CreateProjectData {
-  title: string;
-  description: string;
-  status?: 'active' | 'completed';
+  name: string;
+  description?: string;
+  status?: 'planning' | 'in-progress' | 'completed' | 'on-hold';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  endDate?: string;
 }
 
 export interface UpdateProjectData {
-  title?: string;
+  name?: string;
   description?: string;
-  status?: 'active' | 'completed';
+  status?: 'planning' | 'in-progress' | 'completed' | 'on-hold';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  endDate?: string;
 }
 
 export interface CreateTaskData {
   title: string;
-  description: string;
-  dueDate: string;
+  description?: string;
+  dueDate?: string;
   project: string;
-  status?: 'todo' | 'in-progress' | 'done';
-  priority?: 'low' | 'medium' | 'high';
+  assignedTo?: string;
+  status?: 'pending' | 'in-progress' | 'completed';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
 export interface UpdateTaskData {
   title?: string;
   description?: string;
   dueDate?: string;
-  status?: 'todo' | 'in-progress' | 'done';
-  priority?: 'low' | 'medium' | 'high';
+  assignedTo?: string;
+  status?: 'pending' | 'in-progress' | 'completed';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
 }

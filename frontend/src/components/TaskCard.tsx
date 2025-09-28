@@ -13,7 +13,7 @@ interface TaskCardProps {
 const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleStatusChange = async (newStatus: 'todo' | 'in-progress' | 'done') => {
+  const handleStatusChange = async (newStatus: 'pending' | 'in-progress' | 'completed') => {
     setIsUpdating(true);
     try {
       const response = await taskService.updateTask(task._id, { status: newStatus });
@@ -40,8 +40,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
     }
   };
 
-  const isDue = isOverdue(task.dueDate);
-  const projectTitle = typeof task.project === 'object' ? task.project.title : 'Unknown Project';
+  const isDue = task.dueDate ? isOverdue(task.dueDate) : false;
+  const projectTitle = typeof task.project === 'object' ? task.project.name : 'Unknown Project';
 
   return (
     <div className="card p-4 hover:shadow-medium transition-shadow duration-200">
@@ -82,23 +82,25 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
             </span>
           </div>
           
-          <div className={`text-sm ${isDue ? 'text-red-600' : 'text-gray-600'}`}>
-            Due: {formatDate(task.dueDate)}
-            {isDue && <span className="ml-1 text-red-500">(Overdue)</span>}
-          </div>
+          {task.dueDate && (
+            <div className={`text-sm ${isDue ? 'text-red-600' : 'text-gray-600'}`}>
+              Due: {formatDate(task.dueDate)}
+              {isDue && <span className="ml-1 text-red-500">(Overdue)</span>}
+            </div>
+          )}
         </div>
 
         {/* Status Action Buttons */}
         <div className="flex space-x-2">
-          {task.status !== 'todo' && (
+          {task.status !== 'pending' && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleStatusChange('todo')}
+              onClick={() => handleStatusChange('pending')}
               disabled={isUpdating}
               className="text-xs"
             >
-              To Do
+              Pending
             </Button>
           )}
           {task.status !== 'in-progress' && (
@@ -112,15 +114,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onUpdate, onDelete }) => {
               In Progress
             </Button>
           )}
-          {task.status !== 'done' && (
+          {task.status !== 'completed' && (
             <Button
               variant="success"
               size="sm"
-              onClick={() => handleStatusChange('done')}
+              onClick={() => handleStatusChange('completed')}
               disabled={isUpdating}
               className="text-xs"
             >
-              Done
+              Completed
             </Button>
           )}
         </div>

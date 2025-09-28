@@ -14,7 +14,7 @@ const ProjectDetailsPage: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateTask, setShowCreateTask] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'todo' | 'in-progress' | 'done'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
 
   useEffect(() => {
     if (id) {
@@ -27,20 +27,15 @@ const ProjectDetailsPage: React.FC = () => {
     
     setIsLoading(true);
     try {
-      const [projectRes, tasksRes] = await Promise.all([
-        projectService.getProject(id),
-        projectService.getProjectTasks(id, { limit: 100 }),
-      ]);
-
+      const projectRes = await projectService.getProject(id);
+      
       if (projectRes.success) {
         setProject(projectRes.data.project);
+        // Backend returns tasks along with project
+        setTasks(projectRes.data.tasks || []);
       } else {
         navigate('/dashboard');
         return;
-      }
-
-      if (tasksRes.success) {
-        setTasks(tasksRes.data.tasks);
       }
     } catch (error) {
       console.error('Error loading project details:', error);
@@ -91,8 +86,8 @@ const ProjectDetailsPage: React.FC = () => {
     );
   }
 
-  const completionPercentage = project.tasksCount > 0 
-    ? Math.round((project.completedTasksCount / project.tasksCount) * 100)
+  const completionPercentage = (project.tasksCount ?? 0) > 0 
+    ? Math.round(((project.completedTasksCount ?? 0) / (project.tasksCount ?? 1)) * 100)
     : 0;
 
   return (
@@ -109,7 +104,7 @@ const ProjectDetailsPage: React.FC = () => {
                 ← Back
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{project.title}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
                 <div className="flex items-center space-x-3 mt-1">
                   <span className={`status-badge ${getStatusColor(project.status)}`}>
                     {project.status}
@@ -187,9 +182,9 @@ const ProjectDetailsPage: React.FC = () => {
                 className="form-input text-sm"
               >
                 <option value="all">All Tasks ({tasks.length})</option>
-                <option value="todo">To Do ({tasks.filter(t => t.status === 'todo').length})</option>
+                <option value="pending">Pending ({tasks.filter(t => t.status === 'pending').length})</option>
                 <option value="in-progress">In Progress ({tasks.filter(t => t.status === 'in-progress').length})</option>
-                <option value="done">Done ({tasks.filter(t => t.status === 'done').length})</option>
+                <option value="completed">Completed ({tasks.filter(t => t.status === 'completed').length})</option>
               </select>
               <Button
                 variant="outline"

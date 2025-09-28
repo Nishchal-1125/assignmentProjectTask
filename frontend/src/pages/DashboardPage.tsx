@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { projectService, taskService } from '../services';
 import { Project, Task, TaskStats } from '../types';
-import { Button, Loader } from '../components/common';
+import { Button, Loader, Pagination } from '../components/common';
 import ProjectCard from '../components/ProjectCard';
 import TaskCard from '../components/TaskCard';
 import CreateProjectModal from '../components/CreateProjectModal';
@@ -17,31 +17,60 @@ const DashboardPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateProject, setShowCreateProject] = useState(false);
   const [showCreateTask, setShowCreateTask] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<'all' | 'todo' | 'in-progress' | 'done'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'in-progress' | 'completed'>('all');
+  
+  // Pagination state
+  const [projectsPagination, setProjectsPagination] = useState({ current: 1, total: 0, pages: 1 });
+  const [tasksPagination, setTasksPagination] = useState({ current: 1, total: 0, pages: 1 });
+  const [projectsPage, setProjectsPage] = useState(1);
+  const [tasksPage, setTasksPage] = useState(1);
 
   useEffect(() => {
     loadDashboardData();
   }, []);
 
-  const loadDashboardData = async () => {
+  useEffect(() => {
+    loadDashboardData(projectsPage, 1);
+  }, [projectsPage]);
+
+  useEffect(() => {
+    setTasksPage(1); // Reset to first page when filter changes
+    loadDashboardData(projectsPage, 1);
+  }, [filterStatus]);
+
+  const loadDashboardData = async (projPage = projectsPage, taskPage = tasksPage) => {
     setIsLoading(true);
     try {
-      const [projectsRes, tasksRes, statsRes] = await Promise.all([
-        projectService.getProjects({ limit: 10 }),
-        taskService.getTasks({ limit: 10 }),
-        taskService.getTaskStats(),
+      const [projectsRes, tasksRes, allTasksRes] = await Promise.all([
+        projectService.getProjects({ page: projPage, limit: 6 }),
+        taskService.getTasks({ page: taskPage, limit: 8, status: filterStatus === 'all' ? undefined : filterStatus }),
+        taskService.getTasks({ limit: 1000 }), // Get all tasks for stats
       ]);
 
       if (projectsRes.success) {
         setProjects(projectsRes.data.projects);
+        if (projectsRes.data.pagination) {
+          setProjectsPagination(projectsRes.data.pagination);
+        }
       }
 
       if (tasksRes.success) {
         setTasks(tasksRes.data.tasks);
+        if (tasksRes.data.pagination) {
+          setTasksPagination(tasksRes.data.pagination);
+        }
       }
 
-      if (statsRes.success) {
-        setStats(statsRes.data.stats);
+      // Calculate stats from all tasks
+      if (allTasksRes.success) {
+        const allTasks = allTasksRes.data.tasks;
+        const calculatedStats: TaskStats = {
+          total: allTasks.length,
+          pending: allTasks.filter(t => t.status === 'pending').length,
+          'in-progress': allTasks.filter(t => t.status === 'in-progress').length,
+          completed: allTasks.filter(t => t.status === 'completed').length,
+        };
+        setStats(calculatedStats);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -78,9 +107,17 @@ const DashboardPage: React.FC = () => {
     loadDashboardData(); // Refresh to get updated stats
   };
 
-  const filteredTasks = filterStatus === 'all' 
-    ? tasks 
-    : tasks.filter(task => task.status === filterStatus);
+  // Pagination handlers
+  const handleProjectsPageChange = (page: number) => {
+    setProjectsPage(page);
+  };
+
+  const handleTasksPageChange = (page: number) => {
+    setTasksPage(page);
+    loadDashboardData(projectsPage, page);
+  };
+
+  const filteredTasks = tasks; // Tasks are already filtered on the backend
 
   if (isLoading) {
     return (
@@ -163,6 +200,16 @@ const DashboardPage: React.FC = () => {
                 ))
               )}
             </div>
+            
+            {/* Projects Pagination */}
+            <Pagination
+              currentPage={projectsPagination.current}
+              totalPages={projectsPagination.pages}
+              onPageChange={handleProjectsPageChange}
+              showInfo={true}
+              totalItems={projectsPagination.total}
+              itemsPerPage={6}
+            />
           </div>
 
           {/* Tasks Section */}
@@ -176,9 +223,9 @@ const DashboardPage: React.FC = () => {
                   className="form-input text-sm"
                 >
                   <option value="all">All Tasks</option>
-                  <option value="todo">To Do</option>
+                  <option value="pending">Pending</option>
                   <option value="in-progress">In Progress</option>
-                  <option value="done">Done</option>
+                  <option value="completed">Completed</option>
                 </select>
                 <Button
                   variant="outline"
@@ -214,6 +261,16 @@ const DashboardPage: React.FC = () => {
                 ))
               )}
             </div>
+            
+            {/* Tasks Pagination */}
+            <Pagination
+              currentPage={tasksPagination.current}
+              totalPages={tasksPagination.pages}
+              onPageChange={handleTasksPageChange}
+              showInfo={true}
+              totalItems={tasksPagination.total}
+              itemsPerPage={8}
+            />
           </div>
         </div>
       </main>

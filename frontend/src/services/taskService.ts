@@ -9,8 +9,10 @@ import {
 
 export const taskService = {
   getTasks: async (params?: {
-    status?: 'todo' | 'in-progress' | 'done';
+    status?: 'pending' | 'in-progress' | 'completed';
     project?: string;
+    assignedTo?: string;
+    search?: string;
     page?: number;
     limit?: number;
   }): Promise<ApiResponse<{ tasks: Task[]; pagination: any }>> => {
@@ -38,8 +40,5 @@ export const taskService = {
     return response.data;
   },
 
-  getTaskStats: async (): Promise<ApiResponse<{ stats: TaskStats }>> => {
-    const response = await apiClient.get('/tasks/stats/summary');
-    return response.data;
-  },
+
 };

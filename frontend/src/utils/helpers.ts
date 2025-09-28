@@ -32,16 +32,16 @@ export const getDaysUntilDue = (dueDate: string): number => {
 
 export const getStatusColor = (status: string): string => {
   switch (status) {
-    case 'active':
-      return 'status-active';
-    case 'completed':
-      return 'status-completed';
-    case 'todo':
-      return 'status-todo';
+    case 'planning':
+      return 'status-planning';
     case 'in-progress':
       return 'status-in-progress';
-    case 'done':
-      return 'status-done';
+    case 'completed':
+      return 'status-completed';
+    case 'on-hold':
+      return 'status-on-hold';
+    case 'pending':
+      return 'status-pending';
     default:
       return 'status-badge';
   }
@@ -49,6 +49,8 @@ export const getStatusColor = (status: string): string => {
 
 export const getPriorityColor = (priority: string): string => {
   switch (priority) {
+    case 'urgent':
+      return 'priority-urgent';
     case 'high':
       return 'priority-high';
     case 'medium':

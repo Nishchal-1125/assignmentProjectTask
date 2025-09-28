@@ -9,7 +9,9 @@ import {
 
 export const projectService = {
   getProjects: async (params?: {
-    status?: 'active' | 'completed';
+    status?: 'planning' | 'in-progress' | 'completed' | 'on-hold';
+    priority?: 'low' | 'medium' | 'high' | 'urgent';
+    search?: string;
     page?: number;
     limit?: number;
   }): Promise<ApiResponse<{ projects: Project[]; pagination: any }>> => {
@@ -17,7 +19,7 @@ export const projectService = {
     return response.data;
   },
 
-  getProject: async (id: string): Promise<ApiResponse<{ project: Project }>> => {
+  getProject: async (id: string): Promise<ApiResponse<{ project: Project; tasks: any[] }>> => {
     const response = await apiClient.get(`/projects/${id}`);
     return response.data;
   },
@@ -37,15 +39,5 @@ export const projectService = {
     return response.data;
   },
 
-  getProjectTasks: async (
-    id: string,
-    params?: {
-      status?: 'todo' | 'in-progress' | 'done';
-      page?: number;
-      limit?: number;
-    }
-  ): Promise<ApiResponse<{ project: Project; tasks: any[]; pagination: any }>> => {
-    const response = await apiClient.get(`/projects/${id}/tasks`, { params });
-    return response.data;
-  },
+
 };
